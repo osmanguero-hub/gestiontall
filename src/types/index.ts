@@ -6,20 +6,46 @@
 // --- CATÁLOGO Y STOCK ---
 
 export type MetalType = 'Oro 10k' | 'Oro 14k' | 'Plata .925' | 'Chapa' | 'Otro';
+export type MetalColor = 'Amarillo' | 'Blanco' | 'Rosa' | 'N/A';
+export type ProductType = 'Producto Terminado' | 'Subensamble' | 'Paquete';
+export type UnitOfMeasure = 'gramos' | 'piezas';
 
 export interface Product {
     id: string;
-    name: string; // Ej: "Anillo Zafiro" o "Granalla 14k"
     sku: string;
-    type: 'Materia Prima' | 'Producto Terminado' | 'Servicio';
-    category: MetalType;
-    salesPrice?: number; // Precio base de mano de obra (si aplica)
+    name: string; // Nombre_Producto
+    type: ProductType; // Type
+    category: MetalType; // Para filtros
+    color: MetalColor; // Color del material
+    size?: string; // Tamaño (opcional)
 
-    // CONTROL DE INVENTARIO
-    unit: 'gramos' | 'piezas';
-    stockGrams: number; // EXISTENCIA REAL EN GRAMOS (Crítico)
-    weightPerPiece?: number; // Ej: Un anillo pesa 3.5g
+    // INVENTARIO Y MEDICIÓN
+    unit: UnitOfMeasure; // UdM
+    weightPerPiece: number; // Peso_por_Pieza (en gramos)
+    stockGrams: number; // Stock actual en gramos
     minStockGrams: number; // Alerta de stock bajo
+
+    // PRODUCCIÓN
+    yieldPercentage: number; // Rendimiento (0-1, ej: 0.97 = 97%)
+    leadTimeDays: number; // Plazo_de_entrega
+
+    // COMERCIAL
+    salesPrice?: number; // Precio de venta (mano de obra)
+    visibleForSale: boolean; // Visible para venta
+
+    // ESTADO
+    active: boolean; // Activo
+    comments?: string; // Comentarios
+    imageUrl?: string; // Imagen (opcional)
+}
+
+// --- CALCULADORA DE ALEACIÓN ---
+export interface AlloyCalculation {
+    targetKarat: '10k' | '14k';
+    targetWeightGrams: number;
+    pureGoldGrams: number;
+    alloyGrams: number;
+    pureGoldPercentage: number; // 0.417 para 10k, 0.585 para 14k
 }
 
 // --- CLIENTES Y COBRANZA DUAL ---
@@ -41,7 +67,7 @@ export interface Client {
 
 export interface Recipe {
     id: string;
-    productId: string; // Producto final (El Anillo)
+    productId: string; // Producto final
     name: string;
     wastePercentage: number; // Merma teórica (Ej: 0.03 para 3%)
     steps: RecipeStepDefinition[]; // La ruta estándar (Plantilla)
@@ -50,7 +76,7 @@ export interface Recipe {
 
 export interface RecipeIngredient {
     productId: string; // ID de la Granalla/Liga
-    gramsRequired: number; // Cuánto oro consume 1 pieza
+    gramsRequired: number; // Cuánto material consume 1 pieza
 }
 
 export interface RecipeStepDefinition {
@@ -72,13 +98,14 @@ export interface ProductionOrder {
     productName: string;
     clientId?: string;
     clientName?: string;
-    quantityPlanned: number; // Cuántos anillos voy a hacer
+    quantityPlanned: number; // Cuántas piezas
     status: OrderStatus;
     createdAt: string;
     notes?: string;
 
-    // CÁLCULOS DE PESO
-    estimatedWeight: number; // (PesoPieza * Cantidad) + Merma
+    // CÁLCULOS DE PESO Y MATERIAL
+    estimatedWeight: number; // Peso total con merma
+    materialRequired: AlloyCalculation | null; // Si requiere aleación
     realWeightFinished?: number; // Lo que pesó al final
     realWaste?: number; // Merma real registrada
 
@@ -87,14 +114,14 @@ export interface ProductionOrder {
 
 export interface ProductionStep {
     id: string;
-    name: string; // Ej: "Fundición"
+    name: string;
     status: StepStatus;
     order: number;
 
     // CRONÓMETRO ACUMULATIVO (STOPWATCH LOGIC)
-    assignedOperators: string[]; // Lista de nombres (Juan, Pedro)
-    accumulatedMinutes: number; // Tiempo histórico guardado
-    tempStartTime: string | null; // ISO String si está corriendo, null si está pausado
+    assignedOperators: string[];
+    accumulatedMinutes: number;
+    tempStartTime: string | null;
 }
 
 // --- PAGOS Y TRANSACCIONES ---
@@ -106,9 +133,9 @@ export interface Payment {
     id: string;
     clientId: string;
     type: PaymentType;
-    amount?: number; // Si es efectivo
-    grams?: number; // Si es material
-    karat?: MaterialKarat; // Tipo de material
+    amount?: number;
+    grams?: number;
+    karat?: MaterialKarat;
     date: string;
     notes?: string;
 }

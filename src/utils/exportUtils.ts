@@ -20,29 +20,42 @@ export const exportProductsToExcel = (products: Product[]) => {
         SKU: p.sku,
         Nombre: p.name,
         Tipo: p.type,
-        'Categoría Metal': p.category,
-        Unidad: p.unit,
+        Metal: p.category,
+        Color: p.color,
+        Tamaño: p.size || '-',
+        UdM: p.unit,
+        'Peso/Pieza (g)': p.weightPerPiece,
         'Stock (g)': p.stockGrams,
-        'Peso/Pieza (g)': p.weightPerPiece || '-',
-        'Stock Mínimo (g)': p.minStockGrams,
+        'Stock Mín (g)': p.minStockGrams,
+        'Rendimiento (%)': (p.yieldPercentage * 100).toFixed(1),
+        'Plazo (días)': p.leadTimeDays,
         'Precio M.O.': p.salesPrice ? `$${p.salesPrice}` : '-',
+        'Visible Venta': p.visibleForSale ? 'Sí' : 'No',
+        Activo: p.active ? 'Sí' : 'No',
+        Comentarios: p.comments || '-',
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventario');
 
-    // Ajustar anchos de columna
     worksheet['!cols'] = [
         { wch: 15 }, // SKU
-        { wch: 25 }, // Nombre
+        { wch: 30 }, // Nombre
         { wch: 18 }, // Tipo
-        { wch: 15 }, // Categoría
-        { wch: 10 }, // Unidad
+        { wch: 12 }, // Metal
+        { wch: 10 }, // Color
+        { wch: 12 }, // Tamaño
+        { wch: 8 },  // UdM
+        { wch: 12 }, // Peso/Pieza
         { wch: 12 }, // Stock
-        { wch: 15 }, // Peso/Pieza
-        { wch: 15 }, // Stock Mínimo
+        { wch: 12 }, // Stock Mín
+        { wch: 12 }, // Rendimiento
+        { wch: 10 }, // Plazo
         { wch: 12 }, // Precio
+        { wch: 12 }, // Visible
+        { wch: 8 },  // Activo
+        { wch: 30 }, // Comentarios
     ];
 
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -70,14 +83,14 @@ export const exportClientsToExcel = (clients: Client[]) => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Clientes');
 
     worksheet['!cols'] = [
-        { wch: 30 }, // Nombre
-        { wch: 25 }, // Email
-        { wch: 15 }, // Teléfono
-        { wch: 15 }, // Deuda M.O.
-        { wch: 18 }, // Deuda Oro 14k
-        { wch: 18 }, // Deuda Oro 10k
-        { wch: 15 }, // Deuda Plata
-        { wch: 18 }, // Total Material
+        { wch: 30 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 15 },
+        { wch: 18 },
     ];
 
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -99,6 +112,8 @@ export const exportOrdersToExcel = (orders: ProductionOrder[]) => {
             Cliente: o.clientName || '-',
             Cantidad: o.quantityPlanned,
             'Peso Est. (g)': o.estimatedWeight.toFixed(1),
+            'Oro Puro (g)': o.materialRequired?.pureGoldGrams.toFixed(2) || '-',
+            'Liga (g)': o.materialRequired?.alloyGrams.toFixed(2) || '-',
             'Peso Real (g)': o.realWeightFinished?.toFixed(1) || '-',
             Estado: o.status,
             'Pasos Completados': `${completedSteps}/${o.steps.length}`,
@@ -113,17 +128,19 @@ export const exportOrdersToExcel = (orders: ProductionOrder[]) => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Órdenes');
 
     worksheet['!cols'] = [
-        { wch: 15 }, // Folio
-        { wch: 25 }, // Producto
-        { wch: 25 }, // Cliente
-        { wch: 10 }, // Cantidad
-        { wch: 12 }, // Peso Est.
-        { wch: 12 }, // Peso Real
-        { wch: 12 }, // Estado
-        { wch: 18 }, // Pasos
-        { wch: 18 }, // Tiempo
-        { wch: 15 }, // Fecha
-        { wch: 30 }, // Notas
+        { wch: 15 },
+        { wch: 25 },
+        { wch: 25 },
+        { wch: 10 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 15 },
+        { wch: 30 },
     ];
 
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -148,11 +165,11 @@ export const exportRecipesToExcel = (recipes: Recipe[]) => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Recetas');
 
     worksheet['!cols'] = [
-        { wch: 30 }, // Nombre
-        { wch: 12 }, // Merma
-        { wch: 15 }, // Ingredientes
-        { wch: 12 }, // Total Pasos
-        { wch: 60 }, // Pasos
+        { wch: 30 },
+        { wch: 12 },
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 60 },
     ];
 
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -177,8 +194,10 @@ export const exportFullReport = (
         Nombre: p.name,
         Tipo: p.type,
         Metal: p.category,
+        Color: p.color,
         'Stock (g)': p.stockGrams,
-        'Peso/Pieza (g)': p.weightPerPiece || '-',
+        'Peso/Pieza (g)': p.weightPerPiece,
+        'Rendimiento (%)': (p.yieldPercentage * 100).toFixed(1),
         'Precio M.O.': p.salesPrice ? `$${p.salesPrice}` : '-',
     }));
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(productsData), 'Inventario');
@@ -199,6 +218,8 @@ export const exportFullReport = (
         Producto: o.productName,
         Cliente: o.clientName || '-',
         'Peso (g)': o.estimatedWeight.toFixed(1),
+        'Oro Puro (g)': o.materialRequired?.pureGoldGrams.toFixed(2) || '-',
+        'Liga (g)': o.materialRequired?.alloyGrams.toFixed(2) || '-',
         Estado: o.status,
     }));
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(ordersData), 'Órdenes');

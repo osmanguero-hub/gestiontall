@@ -16,153 +16,241 @@ export const mockOperators: Operator[] = [
 ];
 
 // ------------------------------------------
-// PRODUCTOS E INVENTARIO (EN GRAMOS)
+// PRODUCTOS E INVENTARIO
 // ------------------------------------------
 export const mockProducts: Product[] = [
-    // === MATERIAS PRIMAS ===
+    // === PRODUCTOS TERMINADOS ===
     {
         id: 'p1',
-        name: 'Granalla Oro 14k',
-        sku: 'MP-Au14-001',
-        type: 'Materia Prima',
+        sku: 'ANI-14K-001',
+        name: 'Anillo Graduación',
+        type: 'Producto Terminado',
         category: 'Oro 14k',
-        unit: 'gramos',
-        stockGrams: 450.5, // Tengo 450.5 gramos de oro 14k
-        minStockGrams: 100,
+        color: 'Amarillo',
+        size: '7-10',
+        unit: 'piezas',
+        weightPerPiece: 12.5,
+        stockGrams: 25,
+        minStockGrams: 0,
+        yieldPercentage: 0.97, // 97% rendimiento (3% merma)
+        leadTimeDays: 3,
+        salesPrice: 2500,
+        visibleForSale: true,
+        active: true,
+        comments: 'Anillo de graduación oro 14k amarillo',
     },
     {
         id: 'p2',
-        name: 'Granalla Oro 10k',
-        sku: 'MP-Au10-001',
-        type: 'Materia Prima',
-        category: 'Oro 10k',
-        unit: 'gramos',
-        stockGrams: 280.3,
-        minStockGrams: 100,
+        sku: 'CAD-14K-001',
+        name: 'Cadena Cubana 60cm',
+        type: 'Producto Terminado',
+        category: 'Oro 14k',
+        color: 'Amarillo',
+        size: '60cm',
+        unit: 'piezas',
+        weightPerPiece: 45.0,
+        stockGrams: 0,
+        minStockGrams: 0,
+        yieldPercentage: 0.95, // 95% rendimiento (5% merma)
+        leadTimeDays: 5,
+        salesPrice: 8500,
+        visibleForSale: true,
+        active: true,
+        comments: 'Cadena tipo cubana oro 14k',
     },
     {
         id: 'p3',
-        name: 'Liga Italiana',
-        sku: 'MP-Liga-001',
-        type: 'Materia Prima',
-        category: 'Otro',
-        unit: 'gramos',
-        stockGrams: 1200,
-        minStockGrams: 500,
+        sku: 'ARG-14K-001',
+        name: 'Argollas Matrimonio (Par)',
+        type: 'Producto Terminado',
+        category: 'Oro 14k',
+        color: 'Blanco',
+        unit: 'piezas',
+        weightPerPiece: 8.0,
+        stockGrams: 16,
+        minStockGrams: 0,
+        yieldPercentage: 0.98, // 98% rendimiento
+        leadTimeDays: 3,
+        salesPrice: 1800,
+        visibleForSale: true,
+        active: true,
+        comments: 'Par de argollas oro 14k blanco con grabado',
     },
     {
         id: 'p4',
-        name: 'Plata .925',
-        sku: 'MP-Ag925-001',
-        type: 'Materia Prima',
-        category: 'Plata .925',
-        unit: 'gramos',
-        stockGrams: 850,
-        minStockGrams: 200,
+        sku: 'DIJ-10K-001',
+        name: 'Dije Virgen',
+        type: 'Producto Terminado',
+        category: 'Oro 10k',
+        color: 'Amarillo',
+        size: '2cm',
+        unit: 'piezas',
+        weightPerPiece: 3.2,
+        stockGrams: 9.6,
+        minStockGrams: 0,
+        yieldPercentage: 0.96,
+        leadTimeDays: 2,
+        salesPrice: 650,
+        visibleForSale: true,
+        active: true,
     },
     {
         id: 'p5',
-        name: 'Chatarra Oro 14k',
-        sku: 'MP-Chat14-001',
-        type: 'Materia Prima',
-        category: 'Oro 14k',
-        unit: 'gramos',
-        stockGrams: 125.8, // Material recibido de clientes
+        sku: 'PULS-925-001',
+        name: 'Pulsera Plata Esclava',
+        type: 'Producto Terminado',
+        category: 'Plata .925',
+        color: 'N/A',
+        size: '18cm',
+        unit: 'piezas',
+        weightPerPiece: 15.0,
+        stockGrams: 30,
         minStockGrams: 0,
+        yieldPercentage: 0.94,
+        leadTimeDays: 4,
+        salesPrice: 450,
+        visibleForSale: true,
+        active: true,
     },
+
+    // === SUBENSAMBLES ===
     {
         id: 'p6',
-        name: 'Chatarra Oro 10k',
-        sku: 'MP-Chat10-001',
-        type: 'Materia Prima',
-        category: 'Oro 10k',
-        unit: 'gramos',
-        stockGrams: 95.2,
-        minStockGrams: 0,
+        sku: 'SUB-ESLAB-001',
+        name: 'Eslabones Cubanos (x10)',
+        type: 'Subensamble',
+        category: 'Oro 14k',
+        color: 'Amarillo',
+        unit: 'piezas',
+        weightPerPiece: 4.5,
+        stockGrams: 90,
+        minStockGrams: 50,
+        yieldPercentage: 0.97,
+        leadTimeDays: 1,
+        visibleForSale: false,
+        active: true,
+        comments: 'Eslabones prefabricados para cadenas',
     },
     {
         id: 'p7',
-        name: 'Chatarra Plata',
-        sku: 'MP-ChatAg-001',
-        type: 'Materia Prima',
-        category: 'Plata .925',
-        unit: 'gramos',
-        stockGrams: 320,
-        minStockGrams: 0,
+        sku: 'SUB-BROCH-001',
+        name: 'Broche Langosta',
+        type: 'Subensamble',
+        category: 'Oro 14k',
+        color: 'N/A',
+        unit: 'piezas',
+        weightPerPiece: 0.8,
+        stockGrams: 16,
+        minStockGrams: 10,
+        yieldPercentage: 0.99,
+        leadTimeDays: 0,
+        salesPrice: 80,
+        visibleForSale: false,
+        active: true,
     },
 
-    // === PRODUCTOS TERMINADOS ===
+    // === PAQUETES ===
     {
-        id: 'p10',
-        name: 'Anillo Graduación',
-        sku: 'PT-Anillo-001',
-        type: 'Producto Terminado',
+        id: 'p8',
+        sku: 'PAQ-BODA-001',
+        name: 'Paquete Boda (Argollas + Anillo Compromiso)',
+        type: 'Paquete',
         category: 'Oro 14k',
+        color: 'Blanco',
         unit: 'piezas',
-        weightPerPiece: 12.5, // Cada anillo pesa 12.5g
-        stockGrams: 25, // Tengo 2 anillos terminados (25g)
-        minStockGrams: 0,
-        salesPrice: 2500, // Mano de obra
-    },
-    {
-        id: 'p11',
-        name: 'Cadena Cubana 60cm',
-        sku: 'PT-Cadena-001',
-        type: 'Producto Terminado',
-        category: 'Oro 14k',
-        unit: 'piezas',
-        weightPerPiece: 45.0, // Cada cadena pesa 45g
+        weightPerPiece: 18.0,
         stockGrams: 0,
         minStockGrams: 0,
-        salesPrice: 8500,
+        yieldPercentage: 0.98,
+        leadTimeDays: 5,
+        salesPrice: 4500,
+        visibleForSale: true,
+        active: true,
+        comments: 'Paquete incluye argollas + anillo con zirconia',
     },
+
+    // === MATERIAS PRIMAS (para inventario) ===
     {
-        id: 'p12',
-        name: 'Argollas Matrimonio (Par)',
-        sku: 'PT-Argolla-001',
+        id: 'mp1',
+        sku: 'MP-Au14-PURE',
+        name: 'Oro Puro (para ligado)',
         type: 'Producto Terminado',
         category: 'Oro 14k',
-        unit: 'piezas',
-        weightPerPiece: 8.0, // El par pesa 8g
-        stockGrams: 16, // 2 pares en stock
-        minStockGrams: 0,
-        salesPrice: 1800,
+        color: 'Amarillo',
+        unit: 'gramos',
+        weightPerPiece: 1,
+        stockGrams: 450.5,
+        minStockGrams: 100,
+        yieldPercentage: 1.0,
+        leadTimeDays: 0,
+        visibleForSale: false,
+        active: true,
+        comments: 'Oro puro para aleación',
     },
     {
-        id: 'p13',
-        name: 'Dije Virgen',
-        sku: 'PT-Dije-001',
+        id: 'mp2',
+        sku: 'MP-LIGA-001',
+        name: 'Liga Italiana',
+        type: 'Producto Terminado',
+        category: 'Otro',
+        color: 'N/A',
+        unit: 'gramos',
+        weightPerPiece: 1,
+        stockGrams: 1200,
+        minStockGrams: 500,
+        yieldPercentage: 1.0,
+        leadTimeDays: 0,
+        visibleForSale: false,
+        active: true,
+    },
+    {
+        id: 'mp3',
+        sku: 'MP-Chat14-001',
+        name: 'Chatarra Oro 14k',
+        type: 'Producto Terminado',
+        category: 'Oro 14k',
+        color: 'Amarillo',
+        unit: 'gramos',
+        weightPerPiece: 1,
+        stockGrams: 125.8,
+        minStockGrams: 0,
+        yieldPercentage: 1.0,
+        leadTimeDays: 0,
+        visibleForSale: false,
+        active: true,
+        comments: 'Material recibido de clientes',
+    },
+    {
+        id: 'mp4',
+        sku: 'MP-Chat10-001',
+        name: 'Chatarra Oro 10k',
         type: 'Producto Terminado',
         category: 'Oro 10k',
-        unit: 'piezas',
-        weightPerPiece: 3.2,
-        stockGrams: 9.6, // 3 piezas
-        minStockGrams: 0,
-        salesPrice: 650,
-    },
-
-    // === SERVICIOS ===
-    {
-        id: 'p20',
-        name: 'Servicio de Fundición',
-        sku: 'SV-Fund-001',
-        type: 'Servicio',
-        category: 'Otro',
+        color: 'Amarillo',
         unit: 'gramos',
-        stockGrams: 0,
+        weightPerPiece: 1,
+        stockGrams: 95.2,
         minStockGrams: 0,
-        salesPrice: 50, // $50 por gramo fundido
+        yieldPercentage: 1.0,
+        leadTimeDays: 0,
+        visibleForSale: false,
+        active: true,
     },
     {
-        id: 'p21',
-        name: 'Servicio de Soldadura',
-        sku: 'SV-Sold-001',
-        type: 'Servicio',
-        category: 'Otro',
-        unit: 'piezas',
-        stockGrams: 0,
+        id: 'mp5',
+        sku: 'MP-ChatAg-001',
+        name: 'Chatarra Plata',
+        type: 'Producto Terminado',
+        category: 'Plata .925',
+        color: 'N/A',
+        unit: 'gramos',
+        weightPerPiece: 1,
+        stockGrams: 320,
         minStockGrams: 0,
-        salesPrice: 150, // Por soldadura
+        yieldPercentage: 1.0,
+        leadTimeDays: 0,
+        visibleForSale: false,
+        active: true,
     },
 ];
 
@@ -175,9 +263,9 @@ export const mockClients: Client[] = [
         name: 'Joyería La Esmeralda',
         email: 'ventas@esmeralda.com',
         phone: '555-1234',
-        balanceMoney: 15000, // Me deben $15,000 pesos de mano de obra
+        balanceMoney: 15000,
         balanceGold10k: 0,
-        balanceGold14k: 45.2, // Y me deben 45.2 gramos de material 14k
+        balanceGold14k: 45.2,
         balanceSilver: 0,
     },
     {
@@ -194,17 +282,17 @@ export const mockClients: Client[] = [
         id: 'c3',
         name: 'Juan Pérez (Particular)',
         phone: '555-9012',
-        balanceMoney: 0, // Al corriente en dinero
+        balanceMoney: 0,
         balanceGold10k: 0,
         balanceGold14k: 0,
-        balanceSilver: 150, // Me debe 150g de plata
+        balanceSilver: 150,
     },
     {
         id: 'c4',
         name: 'Distribuidora Dorada',
         email: 'pedidos@dorada.com',
         phone: '555-3456',
-        balanceMoney: 52000, // Cliente grande
+        balanceMoney: 52000,
         balanceGold10k: 35.8,
         balanceGold14k: 78.5,
         balanceSilver: 0,
@@ -216,7 +304,7 @@ export const mockClients: Client[] = [
         balanceMoney: 0,
         balanceGold10k: 0,
         balanceGold14k: 0,
-        balanceSilver: 0, // Cliente al corriente
+        balanceSilver: 0,
     },
 ];
 
@@ -226,12 +314,12 @@ export const mockClients: Client[] = [
 export const mockRecipes: Recipe[] = [
     {
         id: 'r1',
-        productId: 'p10', // Anillo Graduación
+        productId: 'p1',
         name: 'Anillo Graduación 14k',
-        wastePercentage: 0.03, // 3% de merma
+        wastePercentage: 0.03,
         ingredients: [
-            { productId: 'p1', gramsRequired: 11.5 }, // Granalla 14k
-            { productId: 'p3', gramsRequired: 1.5 },  // Liga
+            { productId: 'mp1', gramsRequired: 7.3 }, // Oro puro (58.5% de 12.5g)
+            { productId: 'mp2', gramsRequired: 5.2 }, // Liga
         ],
         steps: [
             { id: 'r1s1', name: 'Fundición', order: 10, estimatedMinutes: 45 },
@@ -243,12 +331,12 @@ export const mockRecipes: Recipe[] = [
     },
     {
         id: 'r2',
-        productId: 'p11', // Cadena Cubana
+        productId: 'p2',
         name: 'Cadena Cubana 60cm',
-        wastePercentage: 0.05, // 5% de merma
+        wastePercentage: 0.05,
         ingredients: [
-            { productId: 'p1', gramsRequired: 42 }, // Granalla 14k
-            { productId: 'p3', gramsRequired: 5 },  // Liga
+            { productId: 'mp1', gramsRequired: 26.3 }, // Oro puro
+            { productId: 'mp2', gramsRequired: 18.7 }, // Liga
         ],
         steps: [
             { id: 'r2s1', name: 'Fundición', order: 10, estimatedMinutes: 60 },
@@ -262,12 +350,12 @@ export const mockRecipes: Recipe[] = [
     },
     {
         id: 'r3',
-        productId: 'p12', // Argollas Matrimonio
+        productId: 'p3',
         name: 'Argollas Matrimonio (Par)',
         wastePercentage: 0.02,
         ingredients: [
-            { productId: 'p1', gramsRequired: 7.5 },
-            { productId: 'p3', gramsRequired: 1 },
+            { productId: 'mp1', gramsRequired: 4.7 }, // Oro puro
+            { productId: 'mp2', gramsRequired: 3.3 }, // Liga
         ],
         steps: [
             { id: 'r3s1', name: 'Fundición', order: 10, estimatedMinutes: 30 },
@@ -287,14 +375,21 @@ export const mockOrders: ProductionOrder[] = [
     {
         id: 'op1',
         folio: 'OP-2311-001',
-        productId: 'p10',
+        productId: 'p1',
         productName: 'Anillo Graduación',
         clientId: 'c1',
         clientName: 'Joyería La Esmeralda',
-        quantityPlanned: 10, // Voy a hacer 10 anillos
+        quantityPlanned: 10,
         status: 'En Proceso',
         createdAt: new Date().toISOString(),
-        estimatedWeight: 128.75, // (12.5g * 10) + 3% merma
+        estimatedWeight: 128.75,
+        materialRequired: {
+            targetKarat: '14k',
+            targetWeightGrams: 128.75,
+            pureGoldGrams: 75.32,
+            alloyGrams: 53.43,
+            pureGoldPercentage: 0.585,
+        },
         notes: 'Oro 14k amarillo, talla 7-10',
         steps: [
             {
@@ -303,7 +398,7 @@ export const mockOrders: ProductionOrder[] = [
                 status: 'Terminada',
                 order: 10,
                 assignedOperators: ['Maestro Luis'],
-                accumulatedMinutes: 120, // Tardaron 2 horas
+                accumulatedMinutes: 120,
                 tempStartTime: null,
             },
             {
@@ -318,11 +413,11 @@ export const mockOrders: ProductionOrder[] = [
             {
                 id: 's3',
                 name: 'Limpieza y Lijado',
-                status: 'En Proceso', // ESTÁ CORRIENDO AHORA MISMO
+                status: 'En Proceso',
                 order: 30,
                 assignedOperators: ['Aprendiz Pedro'],
                 accumulatedMinutes: 45,
-                tempStartTime: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // Empezó hace 15 mins
+                tempStartTime: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
             },
             {
                 id: 's4',
@@ -347,14 +442,21 @@ export const mockOrders: ProductionOrder[] = [
     {
         id: 'op2',
         folio: 'OP-2311-002',
-        productId: 'p11',
+        productId: 'p2',
         productName: 'Cadena Cubana 60cm',
         clientId: 'c4',
         clientName: 'Distribuidora Dorada',
         quantityPlanned: 3,
         status: 'Planeada',
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Ayer
-        estimatedWeight: 141.75, // (45g * 3) + 5% merma
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+        estimatedWeight: 141.75,
+        materialRequired: {
+            targetKarat: '14k',
+            targetWeightGrams: 141.75,
+            pureGoldGrams: 82.92,
+            alloyGrams: 58.83,
+            pureGoldPercentage: 0.585,
+        },
         notes: 'Oro 14k, acabado brillante',
         steps: [
             {
@@ -425,14 +527,21 @@ export const mockOrders: ProductionOrder[] = [
     {
         id: 'op3',
         folio: 'OP-2311-003',
-        productId: 'p12',
+        productId: 'p3',
         productName: 'Argollas Matrimonio (Par)',
         clientId: 'c3',
         clientName: 'Juan Pérez (Particular)',
         quantityPlanned: 1,
         status: 'Terminada',
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // Hace 3 días
-        estimatedWeight: 8.16, // 8g + 2% merma
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+        estimatedWeight: 8.16,
+        materialRequired: {
+            targetKarat: '14k',
+            targetWeightGrams: 8.16,
+            pureGoldGrams: 4.77,
+            alloyGrams: 3.39,
+            pureGoldPercentage: 0.585,
+        },
         realWeightFinished: 8.1,
         realWaste: 0.5,
         notes: 'Oro 14k blanco, grabado "J&M 2023", talla 6 y 9',
