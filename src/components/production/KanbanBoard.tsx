@@ -8,7 +8,8 @@ import {
     ChevronDown,
     ChevronRight,
     Clock,
-    Package
+    Package,
+    Scale
 } from 'lucide-react';
 import { useOrderStore } from '../../stores/orderStore';
 import type { ProductionOrder, OrderStatus } from '../../types';
@@ -19,6 +20,7 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; bgColor:
     'Planeada': { label: 'Planeadas', color: 'text-blue-400', bgColor: 'bg-blue-500/10' },
     'En Proceso': { label: 'En Proceso', color: 'text-amber-400', bgColor: 'bg-amber-500/10' },
     'Terminada': { label: 'Terminadas', color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' },
+    'Cancelada': { label: 'Canceladas', color: 'text-red-400', bgColor: 'bg-red-500/10' },
 };
 
 const KanbanBoard: React.FC = () => {
@@ -26,7 +28,7 @@ const KanbanBoard: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
-    // Agrupar órdenes por estado
+    // Agrupar órdenes por estado (sin canceladas)
     const ordersByStatus = {
         'Planeada': orders.filter(o => o.status === 'Planeada'),
         'En Proceso': orders.filter(o => o.status === 'En Proceso'),
@@ -66,7 +68,7 @@ const KanbanBoard: React.FC = () => {
 
             {/* Kanban Columns */}
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-hidden">
-                {(Object.keys(statusConfig) as OrderStatus[]).map((status) => (
+                {(['Planeada', 'En Proceso', 'Terminada'] as const).map((status) => (
                     <div key={status} className="flex flex-col min-h-0">
                         {/* Column Header */}
                         <div className={`flex items-center gap-3 p-3 rounded-t-xl ${statusConfig[status].bgColor}`}>
@@ -155,7 +157,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isExpanded, onToggle }) =>
                 </span>
 
                 <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
                             {order.folio}
                         </span>
@@ -167,29 +169,40 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isExpanded, onToggle }) =>
                         )}
                     </div>
 
-                    <h3 className="text-white font-medium mt-1.5 truncate">{order.recipeName}</h3>
+                    <h3 className="text-white font-medium mt-1.5 truncate">{order.productName}</h3>
 
                     {order.clientName && (
                         <p className="text-slate-400 text-sm mt-0.5 truncate">{order.clientName}</p>
                     )}
 
+                    {/* Peso y cantidad */}
                     <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
+                        <span className="flex items-center gap-1">
+                            <Scale size={12} />
+                            <span className="text-amber-400 font-semibold">{order.estimatedWeight.toFixed(1)}g</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <Package size={12} />
+                            {order.quantityPlanned} pzas
+                        </span>
                         <span className="flex items-center gap-1">
                             <Clock size={12} />
                             {formatTime(totalMinutes)}
                         </span>
-                        <span className="flex items-center gap-1">
-                            <Package size={12} />
-                            {completedSteps}/{order.steps.length} pasos
-                        </span>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="mt-3 h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
-                            style={{ width: `${(completedSteps / order.steps.length) * 100}%` }}
-                        />
+                    <div className="mt-3">
+                        <div className="flex justify-between text-xs text-slate-500 mb-1">
+                            <span>{completedSteps}/{order.steps.length} pasos</span>
+                            <span>{Math.round((completedSteps / order.steps.length) * 100)}%</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
+                                style={{ width: `${(completedSteps / order.steps.length) * 100}%` }}
+                            />
+                        </div>
                     </div>
                 </div>
             </button>
@@ -197,6 +210,11 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isExpanded, onToggle }) =>
             {/* Expanded Steps */}
             {isExpanded && (
                 <div className="border-t border-slate-700/50 p-3 space-y-2 bg-slate-900/50">
+                    {order.notes && (
+                        <div className="text-xs text-slate-400 bg-slate-800/50 p-2 rounded-lg mb-2">
+                            📝 {order.notes}
+                        </div>
+                    )}
                     <div className="text-xs text-slate-500 uppercase tracking-wider px-2 mb-2">
                         Procesos
                     </div>

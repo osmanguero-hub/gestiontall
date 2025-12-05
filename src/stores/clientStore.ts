@@ -1,6 +1,6 @@
 // ===========================================
 // Client Store - Zustand
-// Con lógica de Saldos Duales
+// Con lógica de Saldos Duales (Dinero + Material)
 // ===========================================
 
 import { create } from 'zustand';
@@ -18,12 +18,14 @@ interface ClientState {
 
     // Pagos Duales
     processPayment: (payment: Payment) => void;
-    addDebt: (clientId: string, type: 'money' | 'gold10k' | 'gold14k', amount: number) => void;
+    addDebt: (clientId: string, type: 'money' | 'gold10k' | 'gold14k' | 'silver', amount: number) => void;
 
     // Getters
     getClientById: (id: string) => Client | undefined;
     getClientsWithDebt: () => Client[];
     getPaymentsByClient: (clientId: string) => Payment[];
+    getTotalDebtMoney: () => number;
+    getTotalDebtGold: () => number;
 }
 
 export const useClientStore = create<ClientState>((set, get) => ({
@@ -64,22 +66,39 @@ export const useClientStore = create<ClientState>((set, get) => ({
         } else if (payment.type === 'Material' && payment.grams && payment.karat) {
             // Pago en material:
             // 1. Resta del saldo correspondiente del cliente
-            // 2. Suma al inventario de "Oro Chatarra"
+            // 2. Suma al inventario de "Chatarra"
 
-            const balanceField = payment.karat === '10k' ? 'balanceGold10k' : 'balanceGold14k';
+            let balanceField: keyof Client;
+            let chatarraProductName: string;
+
+            switch (payment.karat) {
+                case '10k':
+                    balanceField = 'balanceGold10k';
+                    chatarraProductName = 'Chatarra Oro 10k';
+                    break;
+                case '14k':
+                    balanceField = 'balanceGold14k';
+                    chatarraProductName = 'Chatarra Oro 14k';
+                    break;
+                case 'Plata':
+                    balanceField = 'balanceSilver';
+                    chatarraProductName = 'Chatarra Plata';
+                    break;
+                default:
+                    return;
+            }
 
             set((state) => ({
                 clients: state.clients.map((c) =>
                     c.id === payment.clientId
-                        ? { ...c, [balanceField]: Math.max(0, c[balanceField] - payment.grams!) }
+                        ? { ...c, [balanceField]: Math.max(0, (c[balanceField] as number) - payment.grams!) }
                         : c
                 ),
             }));
 
             // Actualizar inventario de chatarra
             const productStore = useProductStore.getState();
-            const chatarraProductName = payment.karat === '10k' ? 'Oro Chatarra 10k' : 'Oro Chatarra 14k';
-            const chatarraProduct = productStore.products.find(p => p.name === chatarraProductName);
+            const chatarraProduct = productStore.products.find((p) => p.name === chatarraProductName);
 
             if (chatarraProduct) {
                 productStore.updateStock(chatarraProduct.id, payment.grams);
@@ -99,6 +118,8 @@ export const useClientStore = create<ClientState>((set, get) => ({
                         return { ...c, balanceGold10k: c.balanceGold10k + amount };
                     case 'gold14k':
                         return { ...c, balanceGold14k: c.balanceGold14k + amount };
+                    case 'silver':
+                        return { ...c, balanceSilver: c.balanceSilver + amount };
                     default:
                         return c;
                 }
@@ -110,9 +131,15 @@ export const useClientStore = create<ClientState>((set, get) => ({
 
     getClientsWithDebt: () =>
         get().clients.filter(
-            (c) => c.balanceMoney > 0 || c.balanceGold10k > 0 || c.balanceGold14k > 0
+            (c) => c.balanceMoney > 0 || c.balanceGold10k > 0 || c.balanceGold14k > 0 || c.balanceSilver > 0
         ),
 
     getPaymentsByClient: (clientId) =>
         get().payments.filter((p) => p.clientId === clientId),
+
+    getTotalDebtMoney: () =>
+        get().clients.reduce((sum, c) => sum + c.balanceMoney, 0),
+
+    getTotalDebtGold: () =>
+        get().clients.reduce((sum, c) => sum + c.balanceGold10k + c.balanceGold14k, 0),
 }));

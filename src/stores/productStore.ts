@@ -3,7 +3,7 @@
 // ===========================================
 
 import { create } from 'zustand';
-import type { Product } from '../types';
+import type { Product, MetalType } from '../types';
 import { mockProducts } from '../data/mockData';
 
 interface ProductState {
@@ -15,6 +15,8 @@ interface ProductState {
     updateStock: (id: string, gramsChange: number) => void;
     getProductById: (id: string) => Product | undefined;
     getProductsByType: (type: Product['type']) => Product[];
+    getProductsByCategory: (category: MetalType) => Product[];
+    getLowStockProducts: () => Product[];
 }
 
 export const useProductStore = create<ProductState>((set, get) => ({
@@ -40,4 +42,9 @@ export const useProductStore = create<ProductState>((set, get) => ({
     getProductById: (id) => get().products.find((p) => p.id === id),
 
     getProductsByType: (type) => get().products.filter((p) => p.type === type),
+
+    getProductsByCategory: (category) => get().products.filter((p) => p.category === category),
+
+    getLowStockProducts: () =>
+        get().products.filter((p) => p.stockGrams < p.minStockGrams && p.type === 'Materia Prima'),
 }));

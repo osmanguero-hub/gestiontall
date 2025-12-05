@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import type { ProductionOrder, ProductionStep, StepStatus, OrderStatus } from '../types';
 import { mockOrders } from '../data/mockData';
 import { useRecipeStore } from './recipeStore';
+import { useProductStore } from './productStore';
 
 // Generar ID único
 const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -14,9 +15,10 @@ const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9
 // Generar folio de orden
 const generateFolio = () => {
     const now = new Date();
-    const date = now.toISOString().slice(2, 10).replace(/-/g, '');
+    const year = now.getFullYear().toString().slice(2);
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
     const seq = Math.floor(Math.random() * 900) + 100;
-    return `OP-${date}-${seq}`;
+    return `OP-${year}${month}-${seq}`;
 };
 
 interface OrderState {
@@ -24,7 +26,7 @@ interface OrderState {
     selectedOrderId: string | null;
 
     // Actions
-    createOrder: (recipeId: string, quantity: number, clientId?: string, clientName?: string, notes?: string) => ProductionOrder;
+    createOrder: (productId: string, quantity: number, clientId?: string, clientName?: string, notes?: string) => ProductionOrder | null;
     updateOrder: (id: string, updates: Partial<ProductionOrder>) => void;
     deleteOrder: (id: string) => void;
     setSelectedOrder: (id: string | null) => void;
@@ -52,13 +54,20 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     // =============================================
     // CLONADO DE RECETA AL CREAR ORDEN
     // =============================================
-    createOrder: (recipeId, quantity, clientId, clientName, notes) => {
+    createOrder: (productId, quantity, clientId, clientName, notes) => {
         const recipeStore = useRecipeStore.getState();
-        const recipe = recipeStore.getRecipeById(recipeId);
+        const productStore = useProductStore.getState();
 
-        if (!recipe) {
-            throw new Error('Recipe not found');
+        const recipe = recipeStore.getRecipeByProductId(productId);
+        const product = productStore.getProductById(productId);
+
+        if (!recipe || !product) {
+            return null;
         }
+
+        // Calcular peso estimado con merma
+        const baseWeight = (product.weightPerPiece || 0) * quantity;
+        const estimatedWeight = baseWeight * (1 + recipe.wastePercentage);
 
         // Clonar los pasos de la receta
         const clonedSteps: ProductionStep[] = recipe.steps.map((step) => ({
@@ -67,22 +76,23 @@ export const useOrderStore = create<OrderState>((set, get) => ({
             order: step.order,
             status: 'Pendiente' as StepStatus,
             assignedOperators: [],
-            tempStartTime: null,
             accumulatedMinutes: 0,
+            tempStartTime: null,
         }));
 
         const newOrder: ProductionOrder = {
             id: generateId(),
             folio: generateFolio(),
-            recipeId,
-            recipeName: recipe.name,
+            productId,
+            productName: product.name,
             clientId,
             clientName,
-            status: 'Planeada',
             quantityPlanned: quantity,
-            steps: clonedSteps,
-            createdAt: new Date(),
+            status: 'Planeada',
+            createdAt: new Date().toISOString(),
+            estimatedWeight,
             notes,
+            steps: clonedSteps,
         };
 
         set((state) => ({ orders: [...state.orders, newOrder] }));
@@ -109,9 +119,8 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 
     /**
      * PLAY: Inicia el conteo de tiempo
-     * - Guarda el timestamp actual en tempStartTime
+     * - Guarda el timestamp actual en tempStartTime (ISO String)
      * - Cambia el status a 'En Proceso'
-     * - También cambia el status de la orden si es necesario
      */
     playStep: (orderId, stepId) =>
         set((state) => ({
@@ -123,7 +132,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 
                     return {
                         ...step,
-                        tempStartTime: new Date(),
+                        tempStartTime: new Date().toISOString(),
                         status: 'En Proceso' as StepStatus,
                     };
                 });

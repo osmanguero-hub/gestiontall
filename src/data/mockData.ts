@@ -1,146 +1,282 @@
 // ===========================================
 // GESTIONTALL - Mock Data
+// Datos de Taller de Joyería Real
 // ===========================================
 
-import type { Product, Client, Recipe, ProductionOrder, Operator } from '../types';
+import type { Product, Client, ProductionOrder, Recipe, Operator } from '../types';
 
 // ------------------------------------------
 // OPERADORES
 // ------------------------------------------
 export const mockOperators: Operator[] = [
-    { id: 'op1', name: 'Carlos Mendez', hourlyRate: 150, active: true },
-    { id: 'op2', name: 'María García', hourlyRate: 180, active: true },
-    { id: 'op3', name: 'Juan Pérez', hourlyRate: 140, active: true },
-    { id: 'op4', name: 'Ana López', hourlyRate: 160, active: true },
+    { id: 'op1', name: 'Maestro Luis', hourlyRate: 200, active: true },
+    { id: 'op2', name: 'Oficial Carlos', hourlyRate: 150, active: true },
+    { id: 'op3', name: 'Aprendiz Pedro', hourlyRate: 80, active: true },
+    { id: 'op4', name: 'Pulidora María', hourlyRate: 120, active: true },
 ];
 
 // ------------------------------------------
-// PRODUCTOS E INVENTARIO
+// PRODUCTOS E INVENTARIO (EN GRAMOS)
 // ------------------------------------------
 export const mockProducts: Product[] = [
-    // Materias Primas
-    { id: 'prod1', name: 'Oro Chatarra 10k', type: 'Materia Prima', color: 'Amarillo', stockGrams: 250.5, sellable: false },
-    { id: 'prod2', name: 'Oro Chatarra 14k', type: 'Materia Prima', color: 'Amarillo', stockGrams: 180.3, sellable: false },
-    { id: 'prod3', name: 'Oro Fino 24k', type: 'Materia Prima', color: 'Amarillo', stockGrams: 100.0, sellable: false },
-    { id: 'prod4', name: 'Plata .925', type: 'Materia Prima', color: 'Blanco', stockGrams: 500.0, sellable: false },
-    { id: 'prod5', name: 'Oro Blanco 14k', type: 'Materia Prima', color: 'Blanco', stockGrams: 75.2, sellable: false },
-    { id: 'prod6', name: 'Oro Rosa 14k', type: 'Materia Prima', color: 'Rosa', stockGrams: 45.8, sellable: false },
+    // === MATERIAS PRIMAS ===
+    {
+        id: 'p1',
+        name: 'Granalla Oro 14k',
+        sku: 'MP-Au14-001',
+        type: 'Materia Prima',
+        category: 'Oro 14k',
+        unit: 'gramos',
+        stockGrams: 450.5, // Tengo 450.5 gramos de oro 14k
+        minStockGrams: 100,
+    },
+    {
+        id: 'p2',
+        name: 'Granalla Oro 10k',
+        sku: 'MP-Au10-001',
+        type: 'Materia Prima',
+        category: 'Oro 10k',
+        unit: 'gramos',
+        stockGrams: 280.3,
+        minStockGrams: 100,
+    },
+    {
+        id: 'p3',
+        name: 'Liga Italiana',
+        sku: 'MP-Liga-001',
+        type: 'Materia Prima',
+        category: 'Otro',
+        unit: 'gramos',
+        stockGrams: 1200,
+        minStockGrams: 500,
+    },
+    {
+        id: 'p4',
+        name: 'Plata .925',
+        sku: 'MP-Ag925-001',
+        type: 'Materia Prima',
+        category: 'Plata .925',
+        unit: 'gramos',
+        stockGrams: 850,
+        minStockGrams: 200,
+    },
+    {
+        id: 'p5',
+        name: 'Chatarra Oro 14k',
+        sku: 'MP-Chat14-001',
+        type: 'Materia Prima',
+        category: 'Oro 14k',
+        unit: 'gramos',
+        stockGrams: 125.8, // Material recibido de clientes
+        minStockGrams: 0,
+    },
+    {
+        id: 'p6',
+        name: 'Chatarra Oro 10k',
+        sku: 'MP-Chat10-001',
+        type: 'Materia Prima',
+        category: 'Oro 10k',
+        unit: 'gramos',
+        stockGrams: 95.2,
+        minStockGrams: 0,
+    },
+    {
+        id: 'p7',
+        name: 'Chatarra Plata',
+        sku: 'MP-ChatAg-001',
+        type: 'Materia Prima',
+        category: 'Plata .925',
+        unit: 'gramos',
+        stockGrams: 320,
+        minStockGrams: 0,
+    },
 
-    // Productos Terminados
-    { id: 'prod7', name: 'Anillo Solitario', type: 'Producto Terminado', color: 'Amarillo', stockGrams: 0, sellable: true },
-    { id: 'prod8', name: 'Cadena Eslabón Cubano', type: 'Producto Terminado', color: 'Amarillo', stockGrams: 0, sellable: true },
-    { id: 'prod9', name: 'Argollas de Matrimonio', type: 'Producto Terminado', color: 'Blanco', stockGrams: 0, sellable: true },
-    { id: 'prod10', name: 'Dije Corazón', type: 'Producto Terminado', color: 'Rosa', stockGrams: 0, sellable: true },
+    // === PRODUCTOS TERMINADOS ===
+    {
+        id: 'p10',
+        name: 'Anillo Graduación',
+        sku: 'PT-Anillo-001',
+        type: 'Producto Terminado',
+        category: 'Oro 14k',
+        unit: 'piezas',
+        weightPerPiece: 12.5, // Cada anillo pesa 12.5g
+        stockGrams: 25, // Tengo 2 anillos terminados (25g)
+        minStockGrams: 0,
+        salesPrice: 2500, // Mano de obra
+    },
+    {
+        id: 'p11',
+        name: 'Cadena Cubana 60cm',
+        sku: 'PT-Cadena-001',
+        type: 'Producto Terminado',
+        category: 'Oro 14k',
+        unit: 'piezas',
+        weightPerPiece: 45.0, // Cada cadena pesa 45g
+        stockGrams: 0,
+        minStockGrams: 0,
+        salesPrice: 8500,
+    },
+    {
+        id: 'p12',
+        name: 'Argollas Matrimonio (Par)',
+        sku: 'PT-Argolla-001',
+        type: 'Producto Terminado',
+        category: 'Oro 14k',
+        unit: 'piezas',
+        weightPerPiece: 8.0, // El par pesa 8g
+        stockGrams: 16, // 2 pares en stock
+        minStockGrams: 0,
+        salesPrice: 1800,
+    },
+    {
+        id: 'p13',
+        name: 'Dije Virgen',
+        sku: 'PT-Dije-001',
+        type: 'Producto Terminado',
+        category: 'Oro 10k',
+        unit: 'piezas',
+        weightPerPiece: 3.2,
+        stockGrams: 9.6, // 3 piezas
+        minStockGrams: 0,
+        salesPrice: 650,
+    },
 
-    // Servicios
-    { id: 'prod11', name: 'Servicio de Fundición', type: 'Servicio', color: 'N/A', stockGrams: 0, sellable: true },
-    { id: 'prod12', name: 'Servicio de Soldadura', type: 'Servicio', color: 'N/A', stockGrams: 0, sellable: true },
+    // === SERVICIOS ===
+    {
+        id: 'p20',
+        name: 'Servicio de Fundición',
+        sku: 'SV-Fund-001',
+        type: 'Servicio',
+        category: 'Otro',
+        unit: 'gramos',
+        stockGrams: 0,
+        minStockGrams: 0,
+        salesPrice: 50, // $50 por gramo fundido
+    },
+    {
+        id: 'p21',
+        name: 'Servicio de Soldadura',
+        sku: 'SV-Sold-001',
+        type: 'Servicio',
+        category: 'Otro',
+        unit: 'piezas',
+        stockGrams: 0,
+        minStockGrams: 0,
+        salesPrice: 150, // Por soldadura
+    },
 ];
 
 // ------------------------------------------
-// CLIENTES
+// CLIENTES CON SALDOS DUALES
 // ------------------------------------------
 export const mockClients: Client[] = [
     {
-        id: 'cli1',
-        name: 'Joyería El Diamante',
+        id: 'c1',
+        name: 'Joyería La Esmeralda',
+        email: 'ventas@esmeralda.com',
         phone: '555-1234',
-        email: 'contacto@eldiamante.com',
-        balanceMoney: 15000,    // Debe $15,000 de mano de obra
-        balanceGold10k: 25.5,   // Debe 25.5g de oro 10k
-        balanceGold14k: 0
+        balanceMoney: 15000, // Me deben $15,000 pesos de mano de obra
+        balanceGold10k: 0,
+        balanceGold14k: 45.2, // Y me deben 45.2 gramos de material 14k
+        balanceSilver: 0,
     },
     {
-        id: 'cli2',
-        name: 'Roberto Sánchez',
+        id: 'c2',
+        name: 'Boutique Oro Express',
+        email: 'compras@oroexpress.mx',
         phone: '555-5678',
-        balanceMoney: 0,
-        balanceGold10k: 0,
-        balanceGold14k: 10.2    // Debe 10.2g de oro 14k
+        balanceMoney: 28500,
+        balanceGold10k: 22.5,
+        balanceGold14k: 0,
+        balanceSilver: 85,
     },
     {
-        id: 'cli3',
-        name: 'Boutique Elegance',
+        id: 'c3',
+        name: 'Juan Pérez (Particular)',
         phone: '555-9012',
-        email: 'ventas@elegance.mx',
-        balanceMoney: 8500,
-        balanceGold10k: 15.0,
-        balanceGold14k: 8.5
+        balanceMoney: 0, // Al corriente en dinero
+        balanceGold10k: 0,
+        balanceGold14k: 0,
+        balanceSilver: 150, // Me debe 150g de plata
     },
     {
-        id: 'cli4',
-        name: 'Patricia Morales',
+        id: 'c4',
+        name: 'Distribuidora Dorada',
+        email: 'pedidos@dorada.com',
         phone: '555-3456',
+        balanceMoney: 52000, // Cliente grande
+        balanceGold10k: 35.8,
+        balanceGold14k: 78.5,
+        balanceSilver: 0,
+    },
+    {
+        id: 'c5',
+        name: 'María López (Particular)',
+        phone: '555-7890',
         balanceMoney: 0,
         balanceGold10k: 0,
-        balanceGold14k: 0       // Sin adeudo
-    },
-    {
-        id: 'cli5',
-        name: 'Oro Express SA',
-        phone: '555-7890',
-        email: 'compras@oroexpress.com',
-        balanceMoney: 45000,
-        balanceGold10k: 50.0,
-        balanceGold14k: 30.0
+        balanceGold14k: 0,
+        balanceSilver: 0, // Cliente al corriente
     },
 ];
 
 // ------------------------------------------
-// RECETAS
+// RECETAS DE PRODUCCIÓN
 // ------------------------------------------
 export const mockRecipes: Recipe[] = [
     {
-        id: 'rec1',
-        name: 'Anillo Solitario Clásico',
-        productId: 'prod7',
+        id: 'r1',
+        productId: 'p10', // Anillo Graduación
+        name: 'Anillo Graduación 14k',
+        wastePercentage: 0.03, // 3% de merma
+        ingredients: [
+            { productId: 'p1', gramsRequired: 11.5 }, // Granalla 14k
+            { productId: 'p3', gramsRequired: 1.5 },  // Liga
+        ],
         steps: [
-            { id: 'rs1', name: 'Fundición', order: 10, estimatedMinutes: 30 },
-            { id: 'rs2', name: 'Laminado', order: 20, estimatedMinutes: 20 },
-            { id: 'rs3', name: 'Formado de Aro', order: 30, estimatedMinutes: 45 },
-            { id: 'rs4', name: 'Soldadura', order: 40, estimatedMinutes: 15 },
-            { id: 'rs5', name: 'Engaste de Piedra', order: 50, estimatedMinutes: 60 },
-            { id: 'rs6', name: 'Pulido Final', order: 60, estimatedMinutes: 25 },
-        ]
+            { id: 'r1s1', name: 'Fundición', order: 10, estimatedMinutes: 45 },
+            { id: 'r1s2', name: 'Vaciado', order: 20, estimatedMinutes: 30 },
+            { id: 'r1s3', name: 'Limpieza y Lijado', order: 30, estimatedMinutes: 60 },
+            { id: 'r1s4', name: 'Pulido', order: 40, estimatedMinutes: 45 },
+            { id: 'r1s5', name: 'Control de Calidad', order: 50, estimatedMinutes: 15 },
+        ],
     },
     {
-        id: 'rec2',
-        name: 'Cadena Eslabón Cubano',
-        productId: 'prod8',
+        id: 'r2',
+        productId: 'p11', // Cadena Cubana
+        name: 'Cadena Cubana 60cm',
+        wastePercentage: 0.05, // 5% de merma
+        ingredients: [
+            { productId: 'p1', gramsRequired: 42 }, // Granalla 14k
+            { productId: 'p3', gramsRequired: 5 },  // Liga
+        ],
         steps: [
-            { id: 'rs7', name: 'Fundición', order: 10, estimatedMinutes: 45 },
-            { id: 'rs8', name: 'Trefilado', order: 20, estimatedMinutes: 60 },
-            { id: 'rs9', name: 'Formado de Eslabones', order: 30, estimatedMinutes: 120 },
-            { id: 'rs10', name: 'Soldadura de Eslabones', order: 40, estimatedMinutes: 90 },
-            { id: 'rs11', name: 'Aplanado', order: 50, estimatedMinutes: 40 },
-            { id: 'rs12', name: 'Pulido', order: 60, estimatedMinutes: 30 },
-            { id: 'rs13', name: 'Instalación de Broche', order: 70, estimatedMinutes: 20 },
-        ]
+            { id: 'r2s1', name: 'Fundición', order: 10, estimatedMinutes: 60 },
+            { id: 'r2s2', name: 'Trefilado', order: 20, estimatedMinutes: 90 },
+            { id: 'r2s3', name: 'Formado Eslabones', order: 30, estimatedMinutes: 180 },
+            { id: 'r2s4', name: 'Soldadura', order: 40, estimatedMinutes: 120 },
+            { id: 'r2s5', name: 'Aplanado', order: 50, estimatedMinutes: 60 },
+            { id: 'r2s6', name: 'Pulido', order: 60, estimatedMinutes: 45 },
+            { id: 'r2s7', name: 'Broche', order: 70, estimatedMinutes: 30 },
+        ],
     },
     {
-        id: 'rec3',
-        name: 'Argollas de Matrimonio',
-        productId: 'prod9',
+        id: 'r3',
+        productId: 'p12', // Argollas Matrimonio
+        name: 'Argollas Matrimonio (Par)',
+        wastePercentage: 0.02,
+        ingredients: [
+            { productId: 'p1', gramsRequired: 7.5 },
+            { productId: 'p3', gramsRequired: 1 },
+        ],
         steps: [
-            { id: 'rs14', name: 'Fundición', order: 10, estimatedMinutes: 25 },
-            { id: 'rs15', name: 'Laminado', order: 20, estimatedMinutes: 15 },
-            { id: 'rs16', name: 'Corte y Formado', order: 30, estimatedMinutes: 40 },
-            { id: 'rs17', name: 'Soldadura', order: 40, estimatedMinutes: 20 },
-            { id: 'rs18', name: 'Grabado', order: 50, estimatedMinutes: 30 },
-            { id: 'rs19', name: 'Pulido Final', order: 60, estimatedMinutes: 20 },
-        ]
-    },
-    {
-        id: 'rec4',
-        name: 'Dije Corazón',
-        productId: 'prod10',
-        steps: [
-            { id: 'rs20', name: 'Diseño en Cera', order: 10, estimatedMinutes: 45 },
-            { id: 'rs21', name: 'Fundición a la Cera Perdida', order: 20, estimatedMinutes: 60 },
-            { id: 'rs22', name: 'Limpieza y Ajuste', order: 30, estimatedMinutes: 25 },
-            { id: 'rs23', name: 'Pulido', order: 40, estimatedMinutes: 20 },
-            { id: 'rs24', name: 'Instalación de Argolla', order: 50, estimatedMinutes: 10 },
-        ]
+            { id: 'r3s1', name: 'Fundición', order: 10, estimatedMinutes: 30 },
+            { id: 'r3s2', name: 'Laminado', order: 20, estimatedMinutes: 25 },
+            { id: 'r3s3', name: 'Corte y Formado', order: 30, estimatedMinutes: 40 },
+            { id: 'r3s4', name: 'Soldadura', order: 40, estimatedMinutes: 20 },
+            { id: 'r3s5', name: 'Grabado', order: 50, estimatedMinutes: 45 },
+            { id: 'r3s6', name: 'Pulido Final', order: 60, estimatedMinutes: 30 },
+        ],
     },
 ];
 
@@ -149,64 +285,212 @@ export const mockRecipes: Recipe[] = [
 // ------------------------------------------
 export const mockOrders: ProductionOrder[] = [
     {
-        id: 'ord1',
-        folio: 'OP-231205-001',
-        recipeId: 'rec1',
-        recipeName: 'Anillo Solitario Clásico',
-        clientId: 'cli1',
-        clientName: 'Joyería El Diamante',
+        id: 'op1',
+        folio: 'OP-2311-001',
+        productId: 'p10',
+        productName: 'Anillo Graduación',
+        clientId: 'c1',
+        clientName: 'Joyería La Esmeralda',
+        quantityPlanned: 10, // Voy a hacer 10 anillos
         status: 'En Proceso',
+        createdAt: new Date().toISOString(),
+        estimatedWeight: 128.75, // (12.5g * 10) + 3% merma
+        notes: 'Oro 14k amarillo, talla 7-10',
+        steps: [
+            {
+                id: 's1',
+                name: 'Fundición',
+                status: 'Terminada',
+                order: 10,
+                assignedOperators: ['Maestro Luis'],
+                accumulatedMinutes: 120, // Tardaron 2 horas
+                tempStartTime: null,
+            },
+            {
+                id: 's2',
+                name: 'Vaciado',
+                status: 'Terminada',
+                order: 20,
+                assignedOperators: ['Maestro Luis'],
+                accumulatedMinutes: 45,
+                tempStartTime: null,
+            },
+            {
+                id: 's3',
+                name: 'Limpieza y Lijado',
+                status: 'En Proceso', // ESTÁ CORRIENDO AHORA MISMO
+                order: 30,
+                assignedOperators: ['Aprendiz Pedro'],
+                accumulatedMinutes: 45,
+                tempStartTime: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // Empezó hace 15 mins
+            },
+            {
+                id: 's4',
+                name: 'Pulido',
+                status: 'Pendiente',
+                order: 40,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+            {
+                id: 's5',
+                name: 'Control de Calidad',
+                status: 'Pendiente',
+                order: 50,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+        ],
+    },
+    {
+        id: 'op2',
+        folio: 'OP-2311-002',
+        productId: 'p11',
+        productName: 'Cadena Cubana 60cm',
+        clientId: 'c4',
+        clientName: 'Distribuidora Dorada',
         quantityPlanned: 3,
-        createdAt: new Date('2024-12-01'),
-        notes: 'Oro amarillo 14k, piedras de 0.5ct',
-        steps: [
-            { id: 'os1', name: 'Fundición', order: 10, status: 'Terminada', assignedOperators: ['Carlos Mendez'], tempStartTime: null, accumulatedMinutes: 35 },
-            { id: 'os2', name: 'Laminado', order: 20, status: 'Terminada', assignedOperators: ['Carlos Mendez'], tempStartTime: null, accumulatedMinutes: 22 },
-            { id: 'os3', name: 'Formado de Aro', order: 30, status: 'En Proceso', assignedOperators: ['María García'], tempStartTime: new Date(), accumulatedMinutes: 15 },
-            { id: 'os4', name: 'Soldadura', order: 40, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os5', name: 'Engaste de Piedra', order: 50, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os6', name: 'Pulido Final', order: 60, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-        ]
-    },
-    {
-        id: 'ord2',
-        folio: 'OP-231205-002',
-        recipeId: 'rec2',
-        recipeName: 'Cadena Eslabón Cubano',
-        clientId: 'cli3',
-        clientName: 'Boutique Elegance',
         status: 'Planeada',
-        quantityPlanned: 1,
-        createdAt: new Date('2024-12-03'),
-        notes: '60cm, oro amarillo 10k, 45g aprox',
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Ayer
+        estimatedWeight: 141.75, // (45g * 3) + 5% merma
+        notes: 'Oro 14k, acabado brillante',
         steps: [
-            { id: 'os7', name: 'Fundición', order: 10, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os8', name: 'Trefilado', order: 20, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os9', name: 'Formado de Eslabones', order: 30, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os10', name: 'Soldadura de Eslabones', order: 40, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os11', name: 'Aplanado', order: 50, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os12', name: 'Pulido', order: 60, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-            { id: 'os13', name: 'Instalación de Broche', order: 70, status: 'Pendiente', assignedOperators: [], tempStartTime: null, accumulatedMinutes: 0 },
-        ]
+            {
+                id: 's6',
+                name: 'Fundición',
+                status: 'Pendiente',
+                order: 10,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+            {
+                id: 's7',
+                name: 'Trefilado',
+                status: 'Pendiente',
+                order: 20,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+            {
+                id: 's8',
+                name: 'Formado Eslabones',
+                status: 'Pendiente',
+                order: 30,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+            {
+                id: 's9',
+                name: 'Soldadura',
+                status: 'Pendiente',
+                order: 40,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+            {
+                id: 's10',
+                name: 'Aplanado',
+                status: 'Pendiente',
+                order: 50,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+            {
+                id: 's11',
+                name: 'Pulido',
+                status: 'Pendiente',
+                order: 60,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+            {
+                id: 's12',
+                name: 'Broche',
+                status: 'Pendiente',
+                order: 70,
+                assignedOperators: [],
+                accumulatedMinutes: 0,
+                tempStartTime: null,
+            },
+        ],
     },
     {
-        id: 'ord3',
-        folio: 'OP-231205-003',
-        recipeId: 'rec3',
-        recipeName: 'Argollas de Matrimonio',
-        clientId: 'cli2',
-        clientName: 'Roberto Sánchez',
+        id: 'op3',
+        folio: 'OP-2311-003',
+        productId: 'p12',
+        productName: 'Argollas Matrimonio (Par)',
+        clientId: 'c3',
+        clientName: 'Juan Pérez (Particular)',
+        quantityPlanned: 1,
         status: 'Terminada',
-        quantityPlanned: 2,
-        createdAt: new Date('2024-11-28'),
-        notes: 'Oro blanco 14k, talla 7 y 10, grabado interno',
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // Hace 3 días
+        estimatedWeight: 8.16, // 8g + 2% merma
+        realWeightFinished: 8.1,
+        realWaste: 0.5,
+        notes: 'Oro 14k blanco, grabado "J&M 2023", talla 6 y 9',
         steps: [
-            { id: 'os14', name: 'Fundición', order: 10, status: 'Terminada', assignedOperators: ['Juan Pérez'], tempStartTime: null, accumulatedMinutes: 28 },
-            { id: 'os15', name: 'Laminado', order: 20, status: 'Terminada', assignedOperators: ['Juan Pérez'], tempStartTime: null, accumulatedMinutes: 18 },
-            { id: 'os16', name: 'Corte y Formado', order: 30, status: 'Terminada', assignedOperators: ['Ana López'], tempStartTime: null, accumulatedMinutes: 45 },
-            { id: 'os17', name: 'Soldadura', order: 40, status: 'Terminada', assignedOperators: ['Ana López'], tempStartTime: null, accumulatedMinutes: 22 },
-            { id: 'os18', name: 'Grabado', order: 50, status: 'Terminada', assignedOperators: ['María García'], tempStartTime: null, accumulatedMinutes: 35 },
-            { id: 'os19', name: 'Pulido Final', order: 60, status: 'Terminada', assignedOperators: ['María García'], tempStartTime: null, accumulatedMinutes: 25 },
-        ]
+            {
+                id: 's13',
+                name: 'Fundición',
+                status: 'Terminada',
+                order: 10,
+                assignedOperators: ['Maestro Luis'],
+                accumulatedMinutes: 35,
+                tempStartTime: null,
+            },
+            {
+                id: 's14',
+                name: 'Laminado',
+                status: 'Terminada',
+                order: 20,
+                assignedOperators: ['Oficial Carlos'],
+                accumulatedMinutes: 28,
+                tempStartTime: null,
+            },
+            {
+                id: 's15',
+                name: 'Corte y Formado',
+                status: 'Terminada',
+                order: 30,
+                assignedOperators: ['Oficial Carlos'],
+                accumulatedMinutes: 42,
+                tempStartTime: null,
+            },
+            {
+                id: 's16',
+                name: 'Soldadura',
+                status: 'Terminada',
+                order: 40,
+                assignedOperators: ['Maestro Luis'],
+                accumulatedMinutes: 25,
+                tempStartTime: null,
+            },
+            {
+                id: 's17',
+                name: 'Grabado',
+                status: 'Terminada',
+                order: 50,
+                assignedOperators: ['Pulidora María'],
+                accumulatedMinutes: 55,
+                tempStartTime: null,
+            },
+            {
+                id: 's18',
+                name: 'Pulido Final',
+                status: 'Terminada',
+                order: 60,
+                assignedOperators: ['Pulidora María'],
+                accumulatedMinutes: 32,
+                tempStartTime: null,
+            },
+        ],
     },
 ];

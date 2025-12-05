@@ -3,7 +3,7 @@
 // ===========================================
 
 import { create } from 'zustand';
-import type { Recipe, RecipeStep } from '../types';
+import type { Recipe, RecipeStepDefinition } from '../types';
 import { mockRecipes } from '../data/mockData';
 
 interface RecipeState {
@@ -13,12 +13,13 @@ interface RecipeState {
     addRecipe: (recipe: Recipe) => void;
     updateRecipe: (id: string, updates: Partial<Recipe>) => void;
     deleteRecipe: (id: string) => void;
-    addStepToRecipe: (recipeId: string, step: RecipeStep) => void;
-    updateStep: (recipeId: string, stepId: string, updates: Partial<RecipeStep>) => void;
+    addStepToRecipe: (recipeId: string, step: RecipeStepDefinition) => void;
+    updateStep: (recipeId: string, stepId: string, updates: Partial<RecipeStepDefinition>) => void;
     removeStepFromRecipe: (recipeId: string, stepId: string) => void;
 
     // Getters
     getRecipeById: (id: string) => Recipe | undefined;
+    getRecipeByProductId: (productId: string) => Recipe | undefined;
 }
 
 export const useRecipeStore = create<RecipeState>((set, get) => ({
@@ -72,4 +73,6 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
         })),
 
     getRecipeById: (id) => get().recipes.find((r) => r.id === id),
+
+    getRecipeByProductId: (productId) => get().recipes.find((r) => r.productId === productId),
 }));

@@ -9,211 +9,209 @@ import type { Product, Client, ProductionOrder, Recipe } from '../types';
 // Formatear fecha para nombre de archivo
 const getDateString = () => {
     const now = new Date();
-    return now.toISOString().slice(0, 10);
+    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
 };
 
-// =============================================
-// EXPORTAR PRODUCTOS/INVENTARIO
-// =============================================
+// ===========================================
+// EXPORTAR PRODUCTOS
+// ===========================================
 export const exportProductsToExcel = (products: Product[]) => {
     const data = products.map((p) => ({
-        'ID': p.id,
-        'Nombre': p.name,
-        'Tipo': p.type,
-        'Color': p.color,
-        'Stock (Gramos)': p.stockGrams.toFixed(2),
-        'Vendible': p.sellable ? 'Sí' : 'No',
+        SKU: p.sku,
+        Nombre: p.name,
+        Tipo: p.type,
+        'Categoría Metal': p.category,
+        Unidad: p.unit,
+        'Stock (g)': p.stockGrams,
+        'Peso/Pieza (g)': p.weightPerPiece || '-',
+        'Stock Mínimo (g)': p.minStockGrams,
+        'Precio M.O.': p.salesPrice ? `$${p.salesPrice}` : '-',
     }));
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventario');
 
-    // Ajustar ancho de columnas
-    ws['!cols'] = [
-        { wch: 15 }, { wch: 30 }, { wch: 18 }, { wch: 12 }, { wch: 15 }, { wch: 10 }
+    // Ajustar anchos de columna
+    worksheet['!cols'] = [
+        { wch: 15 }, // SKU
+        { wch: 25 }, // Nombre
+        { wch: 18 }, // Tipo
+        { wch: 15 }, // Categoría
+        { wch: 10 }, // Unidad
+        { wch: 12 }, // Stock
+        { wch: 15 }, // Peso/Pieza
+        { wch: 15 }, // Stock Mínimo
+        { wch: 12 }, // Precio
     ];
 
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `Inventario_${getDateString()}.xlsx`);
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, `GESTIONTALL_Inventario_${getDateString()}.xlsx`);
 };
 
-// =============================================
-// EXPORTAR CLIENTES CON SALDOS
-// =============================================
+// ===========================================
+// EXPORTAR CLIENTES
+// ===========================================
 export const exportClientsToExcel = (clients: Client[]) => {
     const data = clients.map((c) => ({
-        'ID': c.id,
-        'Nombre': c.name,
-        'Teléfono': c.phone || '',
-        'Email': c.email || '',
-        'Saldo Mano de Obra ($)': c.balanceMoney.toFixed(2),
-        'Saldo Oro 10k (g)': c.balanceGold10k.toFixed(2),
-        'Saldo Oro 14k (g)': c.balanceGold14k.toFixed(2),
-        'Estado': (c.balanceMoney > 0 || c.balanceGold10k > 0 || c.balanceGold14k > 0) ? 'CON ADEUDO' : 'AL CORRIENTE',
+        Nombre: c.name,
+        Email: c.email || '-',
+        Teléfono: c.phone || '-',
+        'Deuda M.O. ($)': c.balanceMoney,
+        'Deuda Oro 14k (g)': c.balanceGold14k,
+        'Deuda Oro 10k (g)': c.balanceGold10k,
+        'Deuda Plata (g)': c.balanceSilver,
+        'Total Material (g)': c.balanceGold10k + c.balanceGold14k + c.balanceSilver,
     }));
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Clientes');
 
-    ws['!cols'] = [
-        { wch: 12 }, { wch: 25 }, { wch: 15 }, { wch: 25 },
-        { wch: 20 }, { wch: 18 }, { wch: 18 }, { wch: 15 }
+    worksheet['!cols'] = [
+        { wch: 30 }, // Nombre
+        { wch: 25 }, // Email
+        { wch: 15 }, // Teléfono
+        { wch: 15 }, // Deuda M.O.
+        { wch: 18 }, // Deuda Oro 14k
+        { wch: 18 }, // Deuda Oro 10k
+        { wch: 15 }, // Deuda Plata
+        { wch: 18 }, // Total Material
     ];
 
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `Clientes_${getDateString()}.xlsx`);
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, `GESTIONTALL_Clientes_${getDateString()}.xlsx`);
 };
 
-// =============================================
+// ===========================================
 // EXPORTAR ÓRDENES DE PRODUCCIÓN
-// =============================================
+// ===========================================
 export const exportOrdersToExcel = (orders: ProductionOrder[]) => {
-    // Hoja 1: Resumen de órdenes
-    const orderSummary = orders.map((o) => {
+    const data = orders.map((o) => {
         const totalMinutes = o.steps.reduce((sum, s) => sum + s.accumulatedMinutes, 0);
-        const completedSteps = o.steps.filter(s => s.status === 'Terminada').length;
+        const completedSteps = o.steps.filter((s) => s.status === 'Terminada').length;
 
         return {
-            'Folio': o.folio,
-            'Receta': o.recipeName,
-            'Cliente': o.clientName || 'N/A',
-            'Estado': o.status,
-            'Cantidad': o.quantityPlanned,
+            Folio: o.folio,
+            Producto: o.productName,
+            Cliente: o.clientName || '-',
+            Cantidad: o.quantityPlanned,
+            'Peso Est. (g)': o.estimatedWeight.toFixed(1),
+            'Peso Real (g)': o.realWeightFinished?.toFixed(1) || '-',
+            Estado: o.status,
             'Pasos Completados': `${completedSteps}/${o.steps.length}`,
-            'Tiempo Total (min)': totalMinutes.toFixed(1),
-            'Tiempo Total (hrs)': (totalMinutes / 60).toFixed(2),
-            'Fecha Creación': o.createdAt.toLocaleDateString(),
-            'Notas': o.notes || '',
+            'Tiempo Total (min)': totalMinutes.toFixed(0),
+            'Fecha Creación': new Date(o.createdAt).toLocaleDateString('es-MX'),
+            Notas: o.notes || '-',
         };
     });
 
-    // Hoja 2: Detalle de pasos
-    const stepDetails: any[] = [];
-    orders.forEach((o) => {
-        o.steps.forEach((s) => {
-            stepDetails.push({
-                'Folio Orden': o.folio,
-                'Paso': s.name,
-                'Orden': s.order,
-                'Estado': s.status,
-                'Operadores': s.assignedOperators.join(', ') || 'Sin asignar',
-                'Tiempo (min)': s.accumulatedMinutes.toFixed(1),
-                'Tiempo (hrs)': (s.accumulatedMinutes / 60).toFixed(2),
-            });
-        });
-    });
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Órdenes');
 
-    const ws1 = XLSX.utils.json_to_sheet(orderSummary);
-    const ws2 = XLSX.utils.json_to_sheet(stepDetails);
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws1, 'Ordenes');
-    XLSX.utils.book_append_sheet(wb, ws2, 'Detalle Pasos');
-
-    ws1['!cols'] = [
-        { wch: 18 }, { wch: 25 }, { wch: 20 }, { wch: 12 }, { wch: 10 },
-        { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 15 }, { wch: 30 }
+    worksheet['!cols'] = [
+        { wch: 15 }, // Folio
+        { wch: 25 }, // Producto
+        { wch: 25 }, // Cliente
+        { wch: 10 }, // Cantidad
+        { wch: 12 }, // Peso Est.
+        { wch: 12 }, // Peso Real
+        { wch: 12 }, // Estado
+        { wch: 18 }, // Pasos
+        { wch: 18 }, // Tiempo
+        { wch: 15 }, // Fecha
+        { wch: 30 }, // Notas
     ];
 
-    ws2['!cols'] = [
-        { wch: 18 }, { wch: 25 }, { wch: 8 }, { wch: 12 },
-        { wch: 30 }, { wch: 12 }, { wch: 12 }
-    ];
-
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `Ordenes_Produccion_${getDateString()}.xlsx`);
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, `GESTIONTALL_Ordenes_${getDateString()}.xlsx`);
 };
 
-// =============================================
+// ===========================================
 // EXPORTAR RECETAS
-// =============================================
+// ===========================================
 export const exportRecipesToExcel = (recipes: Recipe[]) => {
-    const data: any[] = [];
+    const data = recipes.map((r) => ({
+        Nombre: r.name,
+        'Merma (%)': (r.wastePercentage * 100).toFixed(1),
+        'Ingredientes': r.ingredients.length,
+        'Total Pasos': r.steps.length,
+        'Pasos': r.steps.map((s) => s.name).join(' → '),
+    }));
 
-    recipes.forEach((r) => {
-        r.steps.forEach((s, index) => {
-            data.push({
-                'Receta': index === 0 ? r.name : '',
-                'ID Receta': index === 0 ? r.id : '',
-                'Paso #': s.order,
-                'Nombre Paso': s.name,
-                'Tiempo Estimado (min)': s.estimatedMinutes || 'N/A',
-            });
-        });
-        // Línea vacía entre recetas
-        data.push({});
-    });
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Recetas');
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Recetas');
-
-    ws['!cols'] = [
-        { wch: 30 }, { wch: 15 }, { wch: 10 }, { wch: 30 }, { wch: 20 }
+    worksheet['!cols'] = [
+        { wch: 30 }, // Nombre
+        { wch: 12 }, // Merma
+        { wch: 15 }, // Ingredientes
+        { wch: 12 }, // Total Pasos
+        { wch: 60 }, // Pasos
     ];
 
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `Recetas_${getDateString()}.xlsx`);
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, `GESTIONTALL_Recetas_${getDateString()}.xlsx`);
 };
 
-// =============================================
-// REPORTE COMPLETO (TODAS LAS HOJAS)
-// =============================================
+// ===========================================
+// EXPORTAR REPORTE COMPLETO
+// ===========================================
 export const exportFullReport = (
     products: Product[],
     clients: Client[],
     orders: ProductionOrder[],
     recipes: Recipe[]
 ) => {
-    const wb = XLSX.utils.book_new();
+    const workbook = XLSX.utils.book_new();
 
-    // Hoja: Inventario
-    const productData = products.map((p) => ({
-        'Nombre': p.name,
-        'Tipo': p.type,
-        'Color': p.color,
-        'Stock (g)': p.stockGrams.toFixed(2),
+    // Hoja de Inventario
+    const productsData = products.map((p) => ({
+        SKU: p.sku,
+        Nombre: p.name,
+        Tipo: p.type,
+        Metal: p.category,
+        'Stock (g)': p.stockGrams,
+        'Peso/Pieza (g)': p.weightPerPiece || '-',
+        'Precio M.O.': p.salesPrice ? `$${p.salesPrice}` : '-',
     }));
-    const wsProducts = XLSX.utils.json_to_sheet(productData);
-    XLSX.utils.book_append_sheet(wb, wsProducts, 'Inventario');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(productsData), 'Inventario');
 
-    // Hoja: Clientes
-    const clientData = clients.map((c) => ({
-        'Nombre': c.name,
-        'Saldo MO ($)': c.balanceMoney.toFixed(2),
-        'Saldo 10k (g)': c.balanceGold10k.toFixed(2),
-        'Saldo 14k (g)': c.balanceGold14k.toFixed(2),
+    // Hoja de Clientes
+    const clientsData = clients.map((c) => ({
+        Nombre: c.name,
+        'Deuda M.O.': `$${c.balanceMoney}`,
+        'Oro 14k (g)': c.balanceGold14k,
+        'Oro 10k (g)': c.balanceGold10k,
+        'Plata (g)': c.balanceSilver,
     }));
-    const wsClients = XLSX.utils.json_to_sheet(clientData);
-    XLSX.utils.book_append_sheet(wb, wsClients, 'Clientes');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(clientsData), 'Clientes');
 
-    // Hoja: Órdenes
-    const orderData = orders.map((o) => ({
-        'Folio': o.folio,
-        'Receta': o.recipeName,
-        'Cliente': o.clientName || 'N/A',
-        'Estado': o.status,
-        'Tiempo (hrs)': (o.steps.reduce((s, step) => s + step.accumulatedMinutes, 0) / 60).toFixed(2),
+    // Hoja de Órdenes
+    const ordersData = orders.map((o) => ({
+        Folio: o.folio,
+        Producto: o.productName,
+        Cliente: o.clientName || '-',
+        'Peso (g)': o.estimatedWeight.toFixed(1),
+        Estado: o.status,
     }));
-    const wsOrders = XLSX.utils.json_to_sheet(orderData);
-    XLSX.utils.book_append_sheet(wb, wsOrders, 'Ordenes');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(ordersData), 'Órdenes');
 
-    // Hoja: Recetas
-    const recipeData = recipes.map((r) => ({
-        'Nombre': r.name,
-        'Pasos': r.steps.length,
-        'Tiempo Est. Total (min)': r.steps.reduce((s, step) => s + (step.estimatedMinutes || 0), 0),
+    // Hoja de Recetas
+    const recipesData = recipes.map((r) => ({
+        Nombre: r.name,
+        'Merma (%)': (r.wastePercentage * 100).toFixed(1),
+        Pasos: r.steps.length,
     }));
-    const wsRecipes = XLSX.utils.json_to_sheet(recipeData);
-    XLSX.utils.book_append_sheet(wb, wsRecipes, 'Recetas');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(recipesData), 'Recetas');
 
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `GESTIONTALL_Reporte_${getDateString()}.xlsx`);
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, `GESTIONTALL_ReporteCompleto_${getDateString()}.xlsx`);
 };
